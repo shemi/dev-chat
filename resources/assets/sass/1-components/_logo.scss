@@ -1,0 +1,26 @@
+.logo {
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  span {
+	font-size: 1em;
+	line-height: 1;
+	display: inline-block;
+  }
+
+  .icon {
+	width: auto;
+	height: auto;
+	display: inline-block;
+	line-height: 1;
+
+	.fas {
+	  line-height: 1;
+	  font-size: 1em;
+	}
+
+  }
+
+}

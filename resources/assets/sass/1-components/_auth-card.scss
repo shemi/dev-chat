@@ -1,0 +1,17 @@
+.auth-card {
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 50px 35px -25px rgba(0, 0, 0, 0.3);
+
+  &.card .tabs li {
+	a {
+	  color: $dark;
+	}
+
+	&.is-active a{
+	  color: $primary;
+	}
+
+  }
+
+}
