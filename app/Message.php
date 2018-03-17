@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Transformers\MessageTransformer;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -47,6 +48,11 @@ class Message extends Model
     public function conversation()
     {
         return $this->belongsTo(Conversation::class);
+    }
+
+    public function transform()
+    {
+        return MessageTransformer::transform($this);
     }
 
 }

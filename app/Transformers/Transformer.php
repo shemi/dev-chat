@@ -33,12 +33,11 @@ abstract class Transformer
 
     public function formatDate($date)
     {
-        $date = Carbon::parse($date);
+        if(! $date) {
+            return null;
+        }
 
-        return [
-            'date' => $date->toIso8601String(),
-            'humans' => $date->diffForHumans()
-        ];
+        return Carbon::parse($date)->toIso8601String();
     }
 
     public static function transform($item)

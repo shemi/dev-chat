@@ -62,6 +62,15 @@ class Conversation extends Model implements HasMediaConversions
         return $this->hasMany(ConversationEvent::class);
     }
 
+    public function getLastMessageAttribute()
+    {
+        return $this
+            ->messages()
+            ->with(['user'])
+            ->latest()
+            ->first();
+    }
+
     public function registerMediaConversions(Media $media = null)
     {
         $this->addMediaConversion('thumb')

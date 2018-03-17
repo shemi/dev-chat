@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\Conversation;
+use App\Message;
 use App\User;
 
 class ConversationTransformer extends Transformer
@@ -16,7 +17,8 @@ class ConversationTransformer extends Transformer
     {
         return [
             'name' => $conversation->name,
-            'last_message' => $conversation->last_message,
+            'lastMessage' => optional($conversation->last_message)->transform(),
+            'lastMessageAt' => $this->formatDate($conversation->last_message_at)
         ];
     }
 }
