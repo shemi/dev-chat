@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Traits\HasPublicId;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
@@ -30,10 +31,11 @@ use Spatie\MediaLibrary\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read mixed $last_message
  */
 class Conversation extends Model implements HasMediaConversions
 {
-    use HasMediaTrait;
+    use HasMediaTrait, HasPublicId;
 
     protected $fillable = [
         'name',

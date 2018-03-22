@@ -9,9 +9,7 @@
 
         </div>
 
-        <div class="conversation">
-
-        </div>
+        <conversations-list></conversations-list>
 
     </div>
 
@@ -21,6 +19,7 @@
 
     import UserBar from './UserBar';
     import ChatSearch from './ChatSearch';
+    import ConversationsList from './ConversationsList';
 
     export default {
 
@@ -32,7 +31,8 @@
 
         components: {
             UserBar,
-            ChatSearch
+            ChatSearch,
+            ConversationsList
         }
 
     }

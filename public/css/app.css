@@ -17811,7 +17811,7 @@ readers do not read off random characters that represent icons */
   font-style: normal;
   font-weight: 400;
   src: url(/fonts/fa-regular-400.eot?701ae6abd4719e9c2ada3535a497b341);
-  src: url(/fonts/fa-regular-400.eot?701ae6abd4719e9c2ada3535a497b341) format("embedded-opentype"), url(/fonts/fa-regular-400.woff2?cd6c777f1945164224dee082abaea03a) format("woff2"), url(/fonts/fa-regular-400.woff?ef60a4f6c25ef7f39f2d25a748dbecfe) format("woff"), url(/fonts/fa-regular-400.ttf?ad97afd3337e8cda302d10ff5a4026b8) format("truetype"), url(/fonts/fa-regular-400.svg?b551b554a67e86a840bc80cbb8066c30) format("svg");
+  src: url(/fonts/fa-regular-400.eot?701ae6abd4719e9c2ada3535a497b341) format("embedded-opentype"), url(/fonts/fa-regular-400.woff2?cd6c777f1945164224dee082abaea03a) format("woff2"), url(/fonts/fa-regular-400.woff?ef60a4f6c25ef7f39f2d25a748dbecfe) format("woff"), url(/fonts/fa-regular-400.ttf?ad97afd3337e8cda302d10ff5a4026b8) format("truetype"), url(/fonts/fa-regular-400.svg?82f60bd0b94a1ed68b1e6e309ce2e8c3) format("svg");
 }
 
 .far {
@@ -17829,7 +17829,7 @@ readers do not read off random characters that represent icons */
   font-style: normal;
   font-weight: 900;
   src: url(/fonts/fa-solid-900.eot?8e3c7f5520f5ae906c6cf6d7f3ddcd19);
-  src: url(/fonts/fa-solid-900.eot?8e3c7f5520f5ae906c6cf6d7f3ddcd19) format("embedded-opentype"), url(/fonts/fa-solid-900.woff2?0ab54153eeeca0ce03978cc463b257f7) format("woff2"), url(/fonts/fa-solid-900.woff?faff92145777a3cbaf8e7367b4807987) format("woff"), url(/fonts/fa-solid-900.ttf?b87b9ba532ace76ae9f6edfe9f72ded2) format("truetype"), url(/fonts/fa-solid-900.svg?448f2aaa315fa9dce7b2cf6ce31caed6) format("svg");
+  src: url(/fonts/fa-solid-900.eot?8e3c7f5520f5ae906c6cf6d7f3ddcd19) format("embedded-opentype"), url(/fonts/fa-solid-900.woff2?0ab54153eeeca0ce03978cc463b257f7) format("woff2"), url(/fonts/fa-solid-900.woff?faff92145777a3cbaf8e7367b4807987) format("woff"), url(/fonts/fa-solid-900.ttf?b87b9ba532ace76ae9f6edfe9f72ded2) format("truetype"), url(/fonts/fa-solid-900.svg?962a1bf31c081691065fe333d9fa8105) format("svg");
 }
 
 .fa,

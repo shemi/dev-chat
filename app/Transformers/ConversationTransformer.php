@@ -15,10 +15,19 @@ class ConversationTransformer extends Transformer
      */
     public function transformModel($conversation)
     {
+        $contacts = $conversation->users->reject(function(User $user) {
+            return $user->id === auth()->id();
+        });
+
         return [
-            'name' => $conversation->name,
+            'conversationId' => $conversation->public_id,
+            'name' => $conversation->is_group ? $conversation->name : $contacts->first()->name,
             'lastMessage' => optional($conversation->last_message)->transform(),
-            'lastMessageAt' => $this->formatDate($conversation->last_message_at)
+            'lastMessageAt' => $this->formatDate($conversation->last_message_at),
+            'messages' => (array) [],
+            'contacts' => UserTransformer::transform($contacts),
+            'image' => null,
+            'isGroup' => $conversation->is_group
         ];
     }
 }

@@ -4,7 +4,7 @@ namespace App\Transformers;
 
 use App\User;
 
-class UserTransformer extends Transformer
+class SearchUserTransformer extends Transformer
 {
 
     /**
@@ -18,6 +18,7 @@ class UserTransformer extends Transformer
             'name' => $user->name,
             'image' => $user->profile_image,
             'username' => $user->username,
+            'conversationId' => optional($user->conversations->first())->id
         ];
     }
 }

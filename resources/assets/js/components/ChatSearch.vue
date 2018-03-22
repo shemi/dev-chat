@@ -11,7 +11,7 @@
                     field="name"
                     :loading="isSearching"
                     @input="search"
-                    @select="option => selected = option">
+                    @select="select">
 
                 <template slot-scope="props">
                     <div class="media">
@@ -55,7 +55,6 @@
         data() {
             return {
                 name: '',
-                selected: null,
                 isSearching: false,
                 data: [],
             }
@@ -77,7 +76,22 @@
                         console.log(data);
                     })
 
-            }, 500)
+            }, 500),
+
+            select(selected) {
+                if(! selected) {
+                    return;
+                }
+
+                this.name = '';
+                if(selected.conversationId) {
+                    this.$store.commit('selectConversationById', selected.conversationId);
+
+                    return;
+                }
+
+                this.$store.dispatch('createConversation', selected);
+            }
 
         }
 

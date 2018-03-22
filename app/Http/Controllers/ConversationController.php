@@ -22,6 +22,7 @@ class ConversationController extends Controller
         ]);
 
         $usernames = $request->input('users');
+        $currentUser = auth()->user();
 
 
 
@@ -35,7 +36,7 @@ class ConversationController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**

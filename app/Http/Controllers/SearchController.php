@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Transformers\SearchUserTransformer;
 use App\Transformers\UserTransformer;
 use App\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
@@ -34,12 +36,30 @@ class SearchController extends Controller
             return $this->response([]);
         }
 
+        /** @var Collection $users */
         $users = User::where('username', 'like', $name.'%')
             ->whereNotIn('id', [$currentUserId])
+            ->with(['media', 'conversations' => function($query) use($currentUserId) {
+                $query->whereHas('users', function($query) use($currentUserId) {
+                        $query->where('user_id', $currentUserId);
+                    })->where('is_group', 0);
+            }])
             ->limit(10)
             ->get();
 
-        return $this->response(UserTransformer::transform($users));
+        $users = $users->sort(function(User $a, User $b) {
+            if ($a->conversations->count() === $b->conversations->count()) {
+                if($a->name === $b->name) {
+                    return 0;
+                }
+
+                return $a->name < $b->name ? -1 : 1;
+            }
+
+            return ($a->conversations->count() < $b->conversations->count()) ? -1 : 1;
+        });
+
+        return $this->response(SearchUserTransformer::transform($users));
     }
 
 }

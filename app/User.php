@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Traits\HasPublicId;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
@@ -31,10 +32,14 @@ use Spatie\MediaLibrary\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUsername($value)
  * @mixin \Eloquent
+ * @property-read mixed $profile_image
+ * @property-read mixed $public_id
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\MediaLibrary\Media[] $media
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User publicId($publicId)
  */
 class User extends Authenticatable implements HasMediaConversions
 {
-    use Notifiable, HasMediaTrait;
+    use Notifiable, HasMediaTrait, HasPublicId;
 
     /**
      * The attributes that are mass assignable.
@@ -80,4 +85,5 @@ class User extends Authenticatable implements HasMediaConversions
         $this->addMediaConversion('thumb')
             ->fit(Manipulations::FIT_CROP, 200, 200);
     }
+
 }
