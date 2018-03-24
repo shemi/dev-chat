@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Traits\HasPublicId;
 use App\Transformers\MessageTransformer;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Message extends Model
 {
+    use HasPublicId;
+
     const TYPE_TEXT = 1;
     const TYPE_IMAGE = 2;
     const TYPE_VIDEO = 3;
@@ -53,6 +56,15 @@ class Message extends Model
     public function transform()
     {
         return MessageTransformer::transform($this);
+    }
+
+    public function setBodyAttribute($value)
+    {
+        $rejex = '/<img.*?title=["|\'](.*?)["|\'].*?>/m';
+        $value = trim(preg_replace($rejex, ':$1:', $value));
+        $value = strip_tags($value, '<br><br /><br/>');
+
+        $this->attributes['body'] = trim($value);
     }
 
 }

@@ -11,6 +11,8 @@
     },
     "devDependencies": {
         "axios": "^0.18",
+        "babel-preset-es2015": "^6.24.1",
+        "babel-preset-stage-2": "^6.24.1",
         "browser-sync": "^2.23.6",
         "browser-sync-webpack-plugin": "^2.0.1",
         "cross-env": "^5.1",
@@ -19,10 +21,18 @@
         "vue": "^2.5.7"
     },
     "dependencies": {
+        "axios-resource": "^0.1.2",
         "buefy": "^0.6.3",
         "bulma": "^0.6.2",
+        "emoji-datasource-google": "^4.0.3",
+        "emoji-js": "^3.4.0",
+        "emoji-mart-vue": "^2.4.5",
         "laravel-echo": "^1.3.5",
+        "moment": "^2.21.0",
+        "rangy": "^1.3.0",
+        "turndown": "^4.0.1",
         "vue-router": "^3.0.1",
+        "vue-simple-markdown": "^1.0.6",
         "vuex": "^3.0.1"
     }
 }

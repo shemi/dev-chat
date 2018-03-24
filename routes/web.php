@@ -11,6 +11,18 @@ Route::group(['prefix' => 'api/v1'], function () {
         ->name('api.search');
 
 
+    Route::post('/conversations', 'ConversationController@store')
+        ->name('api.conversation.create');
+
+    Route::get('/conversations/{conversationId}', 'ConversationController@show')
+        ->name('api.conversation.show');
+
+    Route::put('/conversations/{conversationId}', 'ConversationController@update')
+        ->name('api.conversation.update');
+
+    Route::post('/conversations/{conversationId}/message', 'MessageController@store')
+        ->name('api.conversation.message.send');
+
 });
 
 Route::get('/{subs?}', 'HomeController@index')

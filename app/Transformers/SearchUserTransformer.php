@@ -18,7 +18,7 @@ class SearchUserTransformer extends Transformer
             'name' => $user->name,
             'image' => $user->profile_image,
             'username' => $user->username,
-            'conversationId' => optional($user->conversations->first())->id
+            'conversationId' => optional($user->conversations->first())->public_id
         ];
     }
 }

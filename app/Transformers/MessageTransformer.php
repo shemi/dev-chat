@@ -16,10 +16,12 @@ class MessageTransformer extends Transformer
     public function transformModel($message)
     {
         return [
+            'id' => $message->public_id,
             'body' => $message->body,
             'by' => UserTransformer::transform($message->user),
             'type' => $message->type,
             'createdAt' => $this->formatDate($message->created_at),
+            'sent' => true
         ];
     }
 }

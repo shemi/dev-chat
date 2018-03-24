@@ -9,12 +9,18 @@ export default {
     },
 
     mutations: {
+        setConversations(state, conversations) {
+            _.each(conversations, function(conversation) {
+                state.conversations.push(new Conversation(conversation));
+            });
+        },
+
         addConversation(state, conversation) {
             state.conversations.unshift(conversation);
         },
 
-        selectConversation(state, index) {
-            Vue.set(state, 'selectedConversation', state.conversations[index]);
+        selectConversation(state, conversation) {
+            Vue.set(state, 'selectedConversation', conversation);
         },
 
         selectConversationById(state, id) {
@@ -33,6 +39,10 @@ export default {
 
         getSelectConversation(state) {
             return state.selectedConversation;
+        },
+
+        getSelectConversationId(state) {
+            return state.selectedConversation ? state.selectedConversation.conversationId : '';
         }
     },
 
@@ -40,10 +50,7 @@ export default {
         createConversation({ commit, state }, user) {
             let conversation = Conversation.createFromUser(user);
             commit('addConversation', conversation);
-            commit('selectConversation', 0);
-
-
-
+            commit('selectConversation', conversation);
         }
     }
 }

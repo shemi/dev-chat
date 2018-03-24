@@ -56,7 +56,7 @@ class SearchController extends Controller
                 return $a->name < $b->name ? -1 : 1;
             }
 
-            return ($a->conversations->count() < $b->conversations->count()) ? -1 : 1;
+            return ($a->conversations->count() < $b->conversations->count()) ? 1 : -1;
         });
 
         return $this->response(SearchUserTransformer::transform($users));

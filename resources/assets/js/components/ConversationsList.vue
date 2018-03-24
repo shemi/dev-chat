@@ -2,8 +2,9 @@
 
     <div class="conversations-list">
 
-        <conversations-list-item v-for="conversation in conversations"
+        <conversations-list-item v-for="(conversation, index) in conversations"
                                  :conversation="conversation"
+                                 :index="index"
                                  :is-active="conversation === selectedConversation"
                                  :key="conversation.conversationId">
         </conversations-list-item>
@@ -30,6 +31,7 @@
             // }),
             ...mapGetters({
                 selectedConversation: 'getSelectConversation',
+                selectConversationId: 'getSelectConversationId',
                 conversations: 'getConversations'
             })
         },

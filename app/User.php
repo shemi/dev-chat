@@ -75,9 +75,11 @@ class User extends Authenticatable implements HasMediaConversions
 
     public function getProfileImageAttribute()
     {
-        return optional(
+        $image = optional(
             $this->getMedia('profile-image')->first()
         )->getUrl('thumb');
+
+        return $image ?: url('avatar.jpg');
     }
 
     public function registerMediaConversions(Media $media = null)

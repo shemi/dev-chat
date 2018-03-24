@@ -22,11 +22,11 @@ class ConversationTransformer extends Transformer
         return [
             'conversationId' => $conversation->public_id,
             'name' => $conversation->is_group ? $conversation->name : $contacts->first()->name,
-            'lastMessage' => optional($conversation->last_message)->transform(),
-            'lastMessageAt' => $this->formatDate($conversation->last_message_at),
-            'messages' => (array) [],
+            'lastMessage' => optional($conversation->messages->last())->transform(),
+            'lastMessageAt' => $this->formatDate(optional($conversation->messages->last())->created_at),
+            'messages' => MessageTransformer::transform($conversation->messages),
             'contacts' => UserTransformer::transform($contacts),
-            'image' => null,
+            'image' => $conversation->is_group ? null : $contacts->first()->profile_image,
             'isGroup' => $conversation->is_group
         ];
     }

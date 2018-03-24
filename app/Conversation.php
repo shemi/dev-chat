@@ -51,7 +51,8 @@ class Conversation extends Model implements HasMediaConversions
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_conversation');
+        return $this->belongsToMany(User::class, 'user_conversation')
+            ->withPivot('is_owner', 'color');
     }
 
     public function messages()

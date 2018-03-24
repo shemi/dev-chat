@@ -6,7 +6,7 @@ import conversations from './conversations';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    strict: process.env.NODE_ENV !== 'production',
+    strict: false, //process.env.NODE_ENV !== 'production',
 
     modules: {
         user,

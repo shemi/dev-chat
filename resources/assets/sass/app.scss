@@ -5,6 +5,7 @@
 @import "~bulma/sass/utilities/derived-variables.sass";
 
 @import "0-base/variables";
+@import "0-base/emoji";
 
 @import "~bulma";
 @import "~buefy/src/scss/buefy";
@@ -20,3 +21,9 @@
 @import "1-components/auth-card";
 @import "1-components/user-bar";
 @import "1-components/chat-search";
+@import "1-components/editble";
+@import "1-components/message-form";
+@import "1-components/conversation";
+@import "1-components/conversations-list";
+@import "1-components/conversation-bar";
+@import "1-components/chat";

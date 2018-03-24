@@ -1,0 +1,48 @@
+.editable-area {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+
+  .editable-placeholder {
+	color: #a4a4a4;
+	font-size: 1em;
+	line-height: 1.3em;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	transition: opacity 0.08s linear;
+	user-select: none;
+	z-index: 2;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+  }
+
+  .editable-input {
+	width: 100%;
+	max-width: 100%;
+	line-height: 1.3em;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
+	font-size: 1em;
+	font-weight: normal;
+	max-height: 90px;
+	min-height: 1.3em;
+	outline: none;
+	overflow-x: hidden;
+	overflow-y: auto;
+	position: relative;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	word-break: break-all;
+	z-index: 1;
+  }
+
+}

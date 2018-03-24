@@ -1,0 +1,36 @@
+.conversations-list {
+
+  .conversation-list-item {
+	cursor: pointer;
+	padding: 1rem 0.5em;
+	margin-top: 0;
+	background-color: transparent;
+	transition: background-color 0.2s ease;
+
+	&.is-active {
+	  background-color: rgba($grey, 0.3);
+	}
+
+	&:hover:not(.is-active) {
+	  background-color: rgba($grey, 0.1);
+	}
+
+	&:first-child {
+	  padding-top: 1rem;
+	}
+
+	.media-content {
+	  overflow: visible;
+	  line-height: 1;
+	  font-size: 0.9em;
+	}
+
+	.image {
+	  border-radius: 100%;
+	  overflow: hidden;
+	  border: 1px solid #b5b6ba;
+	}
+
+  }
+
+}

@@ -1,8 +1,10 @@
 <template>
 
-    <div class="media" :class="{'is-active': isActive}">
+    <div class="media conversation-list-item"
+         @click="select(conversation)"
+         :class="{'is-active': isActive}">
         <figure class="media-left">
-            <p class="image is-32x32">
+            <p class="image is-48x48">
                 <img :src="conversation.image">
             </p>
         </figure>
@@ -23,17 +25,26 @@
 
 <script>
 
+    import { mapState, mapGetters, mapMutations } from 'vuex';
+
     export default {
 
         props: [
             'conversation',
-            'isActive'
+            'isActive',
+            'index'
         ],
 
         data() {
             return {
 
             }
+        },
+
+        methods: {
+            ...mapMutations({
+                select: 'selectConversation'
+            })
         }
 
     }
