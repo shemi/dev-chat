@@ -4,6 +4,7 @@ namespace App;
 
 use App\Traits\HasPublicId;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\MediaLibrary\HasMedia\Interfaces\HasMediaConversions;
@@ -32,10 +33,17 @@ use Spatie\MediaLibrary\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation whereUpdatedAt($value)
  * @mixin \Eloquent
  * @property-read mixed $last_message
+ * @property int|null $last_message_id
+ * @property string|null $deleted_at
+ * @property-read mixed $public_id
+ * @property-read \App\Message|null $lastMessage
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation publicId($publicId)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation whereLastMessageId($value)
  */
 class Conversation extends Model implements HasMediaConversions
 {
-    use HasMediaTrait, HasPublicId;
+    use HasMediaTrait, HasPublicId, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -44,9 +52,15 @@ class Conversation extends Model implements HasMediaConversions
         'encryption_key'
     ];
 
+    protected $dates = [
+        'last_message_at',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
+
     protected $casts = [
-        'is_group' => 'boolean',
-        'last_message_at' => 'timestamp'
+        'is_group' => 'boolean'
     ];
 
     public function users()
@@ -65,13 +79,9 @@ class Conversation extends Model implements HasMediaConversions
         return $this->hasMany(ConversationEvent::class);
     }
 
-    public function getLastMessageAttribute()
+    public function lastMessage()
     {
-        return $this
-            ->messages()
-            ->with(['user'])
-            ->latest()
-            ->first();
+        return $this->belongsTo(Message::class, 'last_message_id', 'id');
     }
 
     public function registerMediaConversions(Media $media = null)

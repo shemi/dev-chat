@@ -20,6 +20,7 @@ Route::group(['prefix' => 'api/v1'], function () {
     Route::put('/conversations/{conversationId}', 'ConversationController@update')
         ->name('api.conversation.update');
 
+
     Route::post('/conversations/{conversationId}/message', 'MessageController@store')
         ->name('api.conversation.message.send');
 

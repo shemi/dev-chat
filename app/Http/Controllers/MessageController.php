@@ -40,7 +40,15 @@ class MessageController extends Controller
         $message->body = $request->input('body');
         $message->user_id = $user->id;
         $message->type = (int) $request->input('type');
-        $conversation->messages()->save($message);
+        $message->statuses = [
+            'read' => [$user->public_id],
+            'sent' => [$user->public_id]
+        ];
+        $message = $conversation->messages()->save($message);
+
+        $conversation->last_message_id = $message->id;
+        $conversation->last_message_at = $message->created_at;
+        $conversation->save();
 
         return $this->response(MessageTransformer::transform($message));
     }

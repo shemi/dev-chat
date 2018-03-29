@@ -16,12 +16,19 @@ class CreateConversationsTable extends Migration
         Schema::create('conversations', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->string('name')->nullable();
+            $table->string('name', 320)->nullable();
             $table->boolean('is_group')->default(0);
-            $table->timestamp('last_message_at', 0)->nullable();
             $table->text('encryption_key')->nullable();
 
+            $table->unsignedInteger('last_message_id')->nullable();
+            $table->timestamp('last_message_at', 0)->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
+
+            $table->index(['last_message_at']);
+            $table->index(['name']);
+            $table->index(['name', 'last_message_at']);
         });
     }
 

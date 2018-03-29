@@ -18350,7 +18350,27 @@ html {
 .chat {
   padding: 0.5em;
   overflow: auto;
-  max-height: 100%;
+  height: 100%;
+}
+
+.chat .message-rows {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  min-height: -webkit-min-content;
+  min-height: -moz-min-content;
+  min-height: min-content;
+  height: 100%;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1;
+          flex: 1 1;
 }
 
 .chat .message-row {
@@ -18358,8 +18378,14 @@ html {
   display: -ms-flexbox;
   display: flex;
   margin-bottom: 1rem;
+  min-height: -webkit-min-content;
+  min-height: -moz-min-content;
+  min-height: min-content;
   position: relative;
   z-index: 10;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0;
+          flex: 0 0;
 }
 
 .chat .chat-message {
@@ -18369,6 +18395,8 @@ html {
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
+  max-width: 90%;
+  word-break: break-all;
 }
 
 .chat .chat-message .sender-avatar {
@@ -18427,5 +18455,29 @@ html {
   bottom: 0.25rem;
   font-size: 0.6em;
   line-height: 1.1;
+}
+
+.chat .loading-row {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.chat .loading-row .loading-icon:after {
+  -webkit-animation: spinAround 500ms infinite linear;
+  animation: spinAround 500ms infinite linear;
+  border-radius: 100%;
+  content: "";
+  display: block;
+  position: relative;
+  top: 0;
+  width: 2.5em;
+  height: 2.5em;
+  border: 0.25em solid #00d1b2;
+  border-top-color: transparent;
+  border-right-color: transparent;
 }
 

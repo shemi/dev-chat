@@ -4,33 +4,9 @@
 
         <conversation-bar :conversation="conversation"></conversation-bar>
 
-        <div class="chat">
-
-            <div class="message-row" v-for="message in conversation.messages">
-
-                <div class="chat-message">
-
-                    <div class="sender-avatar">
-                        <div class="image is-48x48">
-                            <img :src="message.by.image" :alt="message.by.name">
-                        </div>
-                    </div>
-
-                    <div class="body">
-                        <div class="sender-name">
-                            {{ message.by.name }} <small>@{{ message.by.username }}</small>
-                        </div>
-                        <div class="content" v-html="message.body"></div>
-                        <div class="time">
-                            {{ message.createdAt.format('hh:mm A') }}
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
+        <chat :messages="conversation.messages"
+              :loading="loadingMessages"
+              :conversation-id="lastConversationId"></chat>
 
         <message-form :conversation="conversation"></message-form>
 
@@ -42,18 +18,55 @@
     import { mapState, mapGetters, mapActions } from 'vuex';
     import ConversationBar  from './ConversationBar';
     import MessageForm  from './MessageForm';
+    import Chat  from './Chat';
 
     export default {
 
         data() {
             return {
+                loadingMessages: false,
+                lastConversationId: null
+            }
+        },
 
+        mounted() {
+            this.initMessages();
+        },
+
+        watch: {
+            conversation() {
+                if(this.lastConversationId !== this.conversation.id) {
+                    this.initMessages();
+                }
             }
         },
 
         methods: {
 
+            initMessages() {
+                this.lastConversationId = this.conversation.conversationId;
+                this.loadMessages();
+            },
 
+            loadMessages(scroll = false) {
+                if(! scroll && this.conversation.isMessagesLoaded()) {
+                    return;
+                }
+
+                if(scroll && this.conversation.hasOlderMessages()) {
+                    return;
+                }
+
+                this.loadingMessages = true;
+
+                this.conversation.fetchMessages()
+                    .then(conversation => {
+                        this.loadingMessages = false;
+                    })
+                    .catch(err => {
+                        this.loadingMessages = false;
+                    });
+            }
 
         },
 
@@ -65,7 +78,8 @@
 
         components: {
             MessageForm,
-            ConversationBar
+            ConversationBar,
+            Chat
         }
 
     }

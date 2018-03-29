@@ -19,12 +19,21 @@ class ConversationTransformer extends Transformer
             return $user->id === auth()->id();
         });
 
+        $lastMessages = optional($conversation->lastMessage)->transform();
+        $messages = collect([]);
+
+        if($conversation->relationLoaded('messages')) {
+            $messages = MessageTransformer::transform($conversation->messages);
+        } else if($lastMessages) {
+            $messages = $messages->push($lastMessages);
+        }
+
         return [
             'conversationId' => $conversation->public_id,
             'name' => $conversation->is_group ? $conversation->name : $contacts->first()->name,
-            'lastMessage' => optional($conversation->messages->last())->transform(),
-            'lastMessageAt' => $this->formatDate(optional($conversation->messages->last())->created_at),
-            'messages' => MessageTransformer::transform($conversation->messages),
+            'lastMessage' => $lastMessages,
+            'lastMessageAt' => $this->formatDate($conversation->last_message_at),
+            'messages' => $messages,
             'contacts' => UserTransformer::transform($contacts),
             'image' => $conversation->is_group ? null : $contacts->first()->profile_image,
             'isGroup' => $conversation->is_group

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Conversation;
+use App\Message;
 use App\Transformers\ConversationTransformer;
+use App\Transformers\MessageTransformer;
 use App\User;
 use Colors\RandomColor;
 use Illuminate\Http\Request;
@@ -81,12 +83,35 @@ class ConversationController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $conversationId
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($conversationId, Request $request)
     {
+        /** @var Conversation $conversation */
+        $conversation = Conversation::findByPublicId($conversationId);
+        $user = auth()->user();
 
+        if(! $conversation) {
+            return $this->responseNotFound();
+        }
+
+        $messages = $conversation->messages()
+            ->with('user')
+            ->take(21)
+            ->latest()
+            ->offset((int) $request->input('offset', 0))
+            ->get();
+
+        if($hasMore = $messages->count() > 20) {
+            $messages->shift();
+        }
+
+        return $this->response([
+            'hasMore' => $hasMore,
+            'messages' => MessageTransformer::transform($messages)
+        ]);
     }
 
     /**

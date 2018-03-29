@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Message whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Message whereUserId($value)
  * @mixin \Eloquent
+ * @property-read mixed $public_id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Message publicId($publicId)
  */
 class Message extends Model
 {
@@ -39,8 +41,13 @@ class Message extends Model
     protected $fillable = [
         'body',
         'user_id',
+        'statuses',
         'conversation_id',
         'type'
+    ];
+
+    protected $casts = [
+        'statuses' => 'array'
     ];
 
     public function user()

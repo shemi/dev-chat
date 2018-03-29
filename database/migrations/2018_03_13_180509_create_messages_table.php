@@ -20,11 +20,15 @@ class CreateMessagesTable extends Migration
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('conversation_id');
             $table->unsignedInteger('type');
+            $table->json('statuses');
 
             $table->timestamps();
 
             $table->index(['user_id', 'conversation_id']);
             $table->index(['conversation_id']);
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('conversation_id')->references('id')->on('conversations');
         });
     }
 

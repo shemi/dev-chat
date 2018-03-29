@@ -21,6 +21,8 @@ class CreateConversationEventsTable extends Migration
             $table->unsignedInteger('type');
 
             $table->timestamps();
+
+            $table->foreign('conversation_id')->references('id')->on('conversations');
         });
     }
 

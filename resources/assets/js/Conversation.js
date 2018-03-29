@@ -8,7 +8,8 @@ class Conversation {
 
     constructor(attributes) {
         this._messagesLoaded = false;
-        this._currentMessagesPage = 1;
+        this._hasOlderMessage = false;
+        this._currentMessagesPage = 0;
         this._connected = false;
 
         if (attributes) {
@@ -50,7 +51,37 @@ class Conversation {
     }
 
     fetchMessages() {
+        return new Promise((resolve, reject) => {
+            let revertOnFail = ! this._messagesLoaded;
+            this._messagesLoaded = true;
 
+            Resource.fetch(this.conversationId, {
+                params: {
+                    page: ++this._currentMessagesPage,
+                    offset: this.messages.length
+                }
+            })
+            .then(({ data }) => {
+                this.addMessages(data.messages, true);
+                this._hasOlderMessage = data.hasMore;
+
+                resolve(this);
+            })
+            .catch(err => {
+                this._messagesLoaded = !revertOnFail;
+
+                console.log(err);
+                reject(err);
+            });
+        });
+    }
+
+    isMessagesLoaded() {
+        return this._messagesLoaded;
+    }
+
+    hasOlderMessages() {
+        return this._hasOlderMessage;
     }
 
     create() {
@@ -69,9 +100,9 @@ class Conversation {
         });
     }
 
-    addMessages(messages) {
+    addMessages(messages, older = false) {
         _.each(messages, message => {
-            this.addMessage(message);
+            this.addMessage(message, older);
         });
     }
 

@@ -22,9 +22,13 @@ class CreateUserConversationTable extends Migration
             $table->string('color')->nullable();
             $table->boolean('is_owner')->default(0);
 
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index(['user_id', 'conversation_id']);
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('conversation_id')->references('id')->on('conversations');
         });
     }
 

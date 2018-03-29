@@ -37,7 +37,11 @@ abstract class Transformer
             return null;
         }
 
-        return Carbon::parse($date)->toIso8601String();
+        try {
+            return Carbon::parse($date)->toIso8601String();
+        } catch (\Exception $exception) {
+            return $date;
+        }
     }
 
     public static function transform($item)
@@ -47,7 +51,7 @@ abstract class Transformer
             return (new static())->transformCollection($item);
         }
 
-        return (new static())->transformModel($item);
+        return $item ? (new static())->transformModel($item) : null;
     }
 
     public abstract function transformModel($item);

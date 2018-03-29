@@ -35,10 +35,8 @@ class HomeController extends Controller
         $user = auth()->user();
         $conversations = $user
             ->conversations()
-            ->with(['users', 'messages' => function($query) {
-                $query->oldest();
-            }])
-            ->latest()
+            ->with(['users', 'lastMessage'])
+            ->latest('last_message_at')
             ->get();
 
         return $this->response([
