@@ -20,6 +20,10 @@ trait HasPublicId
         return $query->where('id', static::decodePublicId($publicId));
     }
 
+    /**
+     * @param $publicId
+     * @return self|null
+     */
     public static function findByPublicId($publicId)
     {
         return static::publicId($publicId)->first();

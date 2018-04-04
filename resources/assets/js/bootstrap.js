@@ -33,6 +33,7 @@ if (token) {
 
 import Echo from 'laravel-echo';
 
+
 window.Echo = new Echo({
     broadcaster: 'socket.io',
     host: window.App.socket_url

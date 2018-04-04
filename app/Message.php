@@ -69,9 +69,8 @@ class Message extends Model
     {
         $rejex = '/<img.*?title=["|\'](.*?)["|\'].*?>/m';
         $value = trim(preg_replace($rejex, ':$1:', $value));
-        $value = strip_tags($value, '<br><br /><br/>');
 
-        $this->attributes['body'] = trim($value);
+        $this->attributes['body'] = trim(strip_tags($value));
     }
 
 }

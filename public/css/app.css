@@ -17885,6 +17885,111 @@ readers do not read off random characters that represent icons */
   font-weight: 900;
 }
 
+pre.highlight {
+  /*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+  padding: 0;
+  white-space: initial;
+}
+
+pre.highlight .hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #abb2bf;
+  background: #282c34;
+}
+
+pre.highlight .hljs-comment,
+pre.highlight .hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+pre.highlight .hljs-doctag,
+pre.highlight .hljs-keyword,
+pre.highlight .hljs-formula {
+  color: #c678dd;
+}
+
+pre.highlight .hljs-section,
+pre.highlight .hljs-name,
+pre.highlight .hljs-selector-tag,
+pre.highlight .hljs-deletion,
+pre.highlight .hljs-subst {
+  color: #e06c75;
+}
+
+pre.highlight .hljs-literal {
+  color: #56b6c2;
+}
+
+pre.highlight .hljs-string,
+pre.highlight .hljs-regexp,
+pre.highlight .hljs-addition,
+pre.highlight .hljs-attribute,
+pre.highlight .hljs-meta-string {
+  color: #98c379;
+}
+
+pre.highlight .hljs-built_in,
+pre.highlight .hljs-class .hljs-title {
+  color: #e6c07b;
+}
+
+pre.highlight .hljs-attr,
+pre.highlight .hljs-variable,
+pre.highlight .hljs-template-variable,
+pre.highlight .hljs-type,
+pre.highlight .hljs-selector-class,
+pre.highlight .hljs-selector-attr,
+pre.highlight .hljs-selector-pseudo,
+pre.highlight .hljs-number {
+  color: #d19a66;
+}
+
+pre.highlight .hljs-symbol,
+pre.highlight .hljs-bullet,
+pre.highlight .hljs-link,
+pre.highlight .hljs-meta,
+pre.highlight .hljs-selector-id,
+pre.highlight .hljs-title {
+  color: #61aeee;
+}
+
+pre.highlight .hljs-emphasis {
+  font-style: italic;
+}
+
+pre.highlight .hljs-strong {
+  font-weight: bold;
+}
+
+pre.highlight .hljs-link {
+  text-decoration: underline;
+}
+
+pre.highlight .hljs {
+  white-space: pre;
+}
+
 body,
 html {
   overflow: hidden;
@@ -18373,21 +18478,6 @@ html {
           flex: 1 1;
 }
 
-.chat .message-row {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  margin-bottom: 1rem;
-  min-height: -webkit-min-content;
-  min-height: -moz-min-content;
-  min-height: min-content;
-  position: relative;
-  z-index: 10;
-  -webkit-box-flex: 0;
-      -ms-flex: 0 0;
-          flex: 0 0;
-}
-
 .chat .chat-message {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -18455,6 +18545,69 @@ html {
   bottom: 0.25rem;
   font-size: 0.6em;
   line-height: 1.1;
+}
+
+.chat .message-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 1rem;
+  min-height: -webkit-min-content;
+  min-height: -moz-min-content;
+  min-height: min-content;
+  position: relative;
+  z-index: 10;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0;
+          flex: 0 0;
+}
+
+.chat .message-row.is-centered {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.chat .message-row.is-mine,
+.chat .message-row.is-mine .chat-message {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+      -ms-flex-direction: row-reverse;
+          flex-direction: row-reverse;
+}
+
+.chat .message-row.is-mine .chat-message .sender-avatar {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+.chat .message-row.is-mine .chat-message .sender-avatar .image {
+  border: 1px solid #00d1b2;
+}
+
+.chat .message-row.is-mine .chat-message .body {
+  background-color: rgba(0, 209, 178, 0.8);
+  color: rgba(0, 209, 178, 0.8);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 0;
+}
+
+.chat .message-row.is-mine .chat-message .body:after {
+  left: auto;
+  right: -0.8em;
+  border: 0.8em solid transparent;
+  border-left-color: inherit;
+  border-right: 0;
+  border-top: 0;
+  margin-right: 0;
+}
+
+.chat .message-row.is-mine .chat-message .time {
+  right: auto;
+  left: 0.5rem;
 }
 
 .chat .loading-row {

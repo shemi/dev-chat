@@ -1,0 +1,10 @@
+pre.highlight {
+  @import "~highlightjs/styles/atom-one-dark";
+  padding: 0;
+  white-space: initial;
+
+  .hljs {
+	white-space: pre;
+  }
+
+}

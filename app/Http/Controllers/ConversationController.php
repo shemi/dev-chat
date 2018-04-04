@@ -100,12 +100,12 @@ class ConversationController extends Controller
         $messages = $conversation->messages()
             ->with('user')
             ->take(21)
-            ->latest()
             ->offset((int) $request->input('offset', 0))
+            ->latest()
             ->get();
 
         if($hasMore = $messages->count() > 20) {
-            $messages->shift();
+            $messages->pop();
         }
 
         return $this->response([

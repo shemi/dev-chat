@@ -4,8 +4,9 @@
 
         <conversation-bar :conversation="conversation"></conversation-bar>
 
-        <chat :messages="conversation.messages"
-              :loading="loadingMessages"
+        <chat :loading="loadingMessages"
+              :conversation="conversation"
+              @load-more="loadMessages(true)"
               :conversation-id="lastConversationId"></chat>
 
         <message-form :conversation="conversation"></message-form>
@@ -49,11 +50,11 @@
             },
 
             loadMessages(scroll = false) {
-                if(! scroll && this.conversation.isMessagesLoaded()) {
+                if(! scroll && this.conversation.isMessagesLoaded() || this.conversation.isFetchingMessages()) {
                     return;
                 }
 
-                if(scroll && this.conversation.hasOlderMessages()) {
+                if(scroll && ! this.conversation.hasOlderMessages()) {
                     return;
                 }
 

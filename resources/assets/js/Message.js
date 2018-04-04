@@ -18,7 +18,7 @@ class Message {
     }
 
     setAttributes(attributes) {
-        this.by = attributes.by;
+        this.setBy(attributes.by);
         this.createdAt = moment(attributes.createdAt);
         this.id = attributes.id;
         this.body = attributes.body || null;
@@ -26,6 +26,13 @@ class Message {
         this.sent = attributes.sent || false;
         this.read = attributes.read || false;
         this.mine = attributes.mine || attributes.by.id === store.state.user.id;
+    }
+
+    setBy(contact) {
+        contact.color = this._conversation.getContactColor(contact.id);
+        this.by = contact;
+
+        return this;
     }
 
     send() {
@@ -49,6 +56,10 @@ class Message {
             'conversationId': this._conversation.conversationId,
             'type': this.type
         }
+    }
+
+    getColor() {
+
     }
 
     static new(message, user, type, conversation) {

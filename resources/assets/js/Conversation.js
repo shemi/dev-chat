@@ -1,16 +1,25 @@
 import Vue from 'vue';
 import Message from './Message';
 import store from './store/index';
-import { conversation as Resource } from './Resources/index';
+import {conversation as Resource} from './Resources/index';
 import moment from 'moment';
+import {isNull} from './Utils';
+import _ from 'lodash';
 
 class Conversation {
 
     constructor(attributes) {
         this._messagesLoaded = false;
         this._hasOlderMessage = false;
+        this._fetchingMessages = false;
         this._currentMessagesPage = 0;
+        this._messageCount = 0;
         this._connected = false;
+        this._connection = null;
+        this._colors = {};
+        this._lastScrollTop = null;
+        this._lastElClientHight = null;
+        this._lastElScrollHeight = null;
 
         if (attributes) {
             this.setAttributes(attributes);
@@ -25,7 +34,7 @@ class Conversation {
         this.contacts = attributes.contacts || [];
         this.messages = [];
 
-        if(_.isArray(attributes.messages) && attributes.messages.length > 0) {
+        if (_.isArray(attributes.messages) && attributes.messages.length > 0) {
             this.addMessages(attributes.messages);
         }
 
@@ -46,33 +55,67 @@ class Conversation {
         return this;
     }
 
+    resetScrollPosition() {
+        this._lastScrollTop = null;
+        this._lastElClientHight = null;
+        this._lastElScrollHeight = null;
+    }
+
+    setScrollPosition(el) {
+        if(! el) {
+            return this;
+        }
+
+        this._lastScrollTop = el.scrollTop;
+        this._lastElClientHight = el.clientHeight;
+        this._lastElScrollHeight = el.scrollHeight;
+
+        return this;
+    }
+
+    getScrollPosition(el) {
+        if (isNull([this._lastScrollTop, this._lastElClientHight, this._lastElScrollHeight])) {
+            return null;
+        }
+
+        return el.scrollTop + (el.scrollHeight - this._lastElScrollHeight);
+    }
+
     connect() {
-        console.log('connecting');
+        this._connection = Echo.private('conversation.' + this.conversationId);
+
+        this._connection.listen('MessageSent', e => {
+            this.addMessage(e.message);
+        });
+    }
+
+    isFetchingMessages() {
+        return this._fetchingMessages;
     }
 
     fetchMessages() {
         return new Promise((resolve, reject) => {
-            let revertOnFail = ! this._messagesLoaded;
-            this._messagesLoaded = true;
+            this._fetchingMessages = true;
 
             Resource.fetch(this.conversationId, {
                 params: {
                     page: ++this._currentMessagesPage,
-                    offset: this.messages.length
+                    offset: this._messageCount
                 }
             })
-            .then(({ data }) => {
-                this.addMessages(data.messages, true);
-                this._hasOlderMessage = data.hasMore;
+                .then(({data}) => {
+                    this.addMessages(data.messages, true);
+                    this._hasOlderMessage = data.hasMore;
+                    this._fetchingMessages = false;
+                    this._messagesLoaded = true;
 
-                resolve(this);
-            })
-            .catch(err => {
-                this._messagesLoaded = !revertOnFail;
+                    resolve(this);
+                })
+                .catch(err => {
+                    this._fetchingMessages = false;
 
-                console.log(err);
-                reject(err);
-            });
+                    reject(err);
+                });
         });
     }
 
@@ -101,9 +144,9 @@ class Conversation {
     }
 
     addMessages(messages, older = false) {
-        _.each(messages, message => {
+        for(let message of messages) {
             this.addMessage(message, older);
-        });
+        }
     }
 
     addMessage(message, older = false) {
@@ -111,11 +154,40 @@ class Conversation {
             message = new Message(message, this);
         }
 
-        if(older) {
-            this.messages.unshift(message);
-        } else {
-            this.messages.push(message);
+        let messages;
+        let groupKey = message.createdAt.format('YYYY-MM-DD'),
+            messagesObject;
+
+
+        for(let group of this.messages) {
+            if(group.date === groupKey) {
+                messagesObject = group;
+            }
         }
+
+        console.log(message);
+
+        if(! messagesObject) {
+            messagesObject = {
+                date: groupKey,
+                messages: []
+            };
+
+            if (older) {
+                this.messages.unshift(messagesObject);
+            } else {
+                this.messages.push(messagesObject);
+
+            }
+        }
+
+        if (older) {
+            messagesObject.messages.unshift(message);
+        } else {
+            messagesObject.messages.push(message);
+        }
+
+        this._messageCount++;
 
         return this;
     }
@@ -144,6 +216,29 @@ class Conversation {
         message.send();
 
         return this;
+    }
+
+    getContactColor(id) {
+        if (!id) {
+            throw new Error('ID is needed');
+        }
+
+        if (this._colors[id]) {
+            return this._colors[id];
+        }
+
+        let color = null,
+            contact;
+
+        for (contact of this.contacts) {
+            if (contact.id === id) {
+                this._colors[id] = color = contact.color;
+
+                break;
+            }
+        }
+
+        return color;
     }
 
     toJson() {

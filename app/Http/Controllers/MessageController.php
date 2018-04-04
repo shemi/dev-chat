@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Conversation;
+use App\Events\MessageSent;
 use App\Message;
 use App\Transformers\ConversationTransformer;
 use App\Transformers\MessageTransformer;
@@ -49,6 +50,8 @@ class MessageController extends Controller
         $conversation->last_message_id = $message->id;
         $conversation->last_message_at = $message->created_at;
         $conversation->save();
+
+        MessageSent::broadcast($message, $conversation)->toOthers();
 
         return $this->response(MessageTransformer::transform($message));
     }

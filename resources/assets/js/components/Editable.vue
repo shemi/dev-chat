@@ -10,6 +10,7 @@
              dir="auto"
              @keypress.enter="onEnter"
              @keyup="onKeyPress"
+             @paste="onPaste"
              ref="textarea">
         </div>
     </div>
@@ -18,11 +19,9 @@
 
 <script>
     import EmojiConvertor from '../Services/EmojiConvertor';
-    import TurndownService from 'turndown';
+    import striptags from 'striptags';
 
-    const defaultParagraphSeparatorString = 'defaultParagraphSeparator';
     const formatBlock = 'formatBlock';
-    const queryCommandValue = command => document.queryCommandValue(command);
     const exec = (command, value = null) => document.execCommand(command, true, value);
 
     export default {
@@ -59,13 +58,10 @@
 
             sanitizeValue(value) {
                 const emojiRegex = /<img.*?title=["|'](.*?)["|'].*?>/gm;
-                value = value.replace(emojiRegex, ':$1:');
+                value = value.replace(emojiRegex, ':$1:').trim();
+                value = striptags(value, [], '\n').trim();
 
-                return (new TurndownService({
-                    headingStyle: 'atx',
-                    fence: '```',
-                    codeBlockStyle: 'fenced'
-                })).turndown(value);
+                return value;
             },
 
             onKeyPress(e) {
@@ -132,6 +128,26 @@
                 event.preventDefault();
                 this.$emit('send', this.newValue);
             },
+
+            onPaste(e) {
+                e.preventDefault();
+                let content,
+                    command;
+
+                if (e.clipboardData) {
+                    content = (e.originalEvent || e).clipboardData.getData('text/plain');
+
+                    exec('insertText', content);
+                }
+
+                else if (window.clipboardData) {
+                    console.log('hear');
+                    content = window.clipboardData.getData('Text');
+
+                    document.selection.createRange().pasteHTML(content);
+                }
+            }
+
         }
 
     }
