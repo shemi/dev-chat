@@ -11,8 +11,41 @@ let mix = require('laravel-mix');
  |
  */
 
+mix.extend(
+    'audio',
+    new class {
+        register(val) {
+
+        }
+
+        dependencies() {
+            return ['url-loader']
+        }
+
+        webpackRules() {
+            return [
+                {
+                    test: /\.mp3$/,
+                    loaders: [
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                name: 'audio/[name].[ext]?[hash]',
+                                publicPath: Config.resourceRoot
+                            }
+                        }
+                    ],
+                },
+            ];
+        }
+
+        webpackPlugins() {}
+    }()
+);
+
 mix.js('resources/assets/js/app.js', 'public/js')
     .sass('resources/assets/sass/app.scss', 'public/css')
+    .audio()
     .browserSync({
         proxy: {
             target: 'http://dev-chat.test',

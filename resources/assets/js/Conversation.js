@@ -20,6 +20,7 @@ class Conversation {
         this._lastScrollTop = null;
         this._lastElClientHight = null;
         this._lastElScrollHeight = null;
+        this._newMessagePlayer = new Audio(require('../sound/message.mp3'));
 
         if (attributes) {
             this.setAttributes(attributes);
@@ -85,6 +86,7 @@ class Conversation {
         this._connection = Echo.private('conversation.' + this.conversationId);
 
         this._connection.listen('MessageSent', e => {
+            this._newMessagePlayer.play();
             this.addMessage(e.message);
         });
     }
