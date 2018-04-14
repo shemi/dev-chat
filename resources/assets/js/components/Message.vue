@@ -13,7 +13,7 @@
                 {{ message.by.name }}
                 <small>@{{ message.by.username }}</small>
             </div>
-            <div class="content" v-html="body"></div>
+            <div class="content" v-once v-html="body"></div>
             <div class="time">
                 {{ message.createdAt.format('hh:mm A') }}
             </div>
@@ -35,12 +35,22 @@
 
         data() {
             return {
-
+                updateMessageClock: null
             }
         },
 
         mounted() {
+            this.updateMessageStatus();
+        },
 
+
+        methods: {
+            updateMessageStatus() {
+                this.updateMessageClock = setTimeout(function() {
+                    this.message.updateStatus();
+                    this.updateMessageClock = null;
+                }.bind(this), 500);
+            }
         },
 
         computed: {
@@ -51,7 +61,7 @@
             },
 
             avatarStyle() {
-                if(! this.message.by || ! this.message.by.color) {
+                if(this.message.mine || ! this.message.by || ! this.message.by.color) {
                     return {};
                 }
 
@@ -61,7 +71,7 @@
             },
 
             bodyStyle() {
-                if(! this.message.by || ! this.message.by.color) {
+                if(this.message.mine || ! this.message.by || ! this.message.by.color) {
                     return {};
                 }
 
@@ -70,7 +80,12 @@
                     backgroundColor: this.message.by.color
                 }
             }
+        },
 
+        beforeDestroy() {
+            if(this.updateMessageClock) {
+                clearTimeout(this.updateMessageClock);
+            }
         }
 
     }

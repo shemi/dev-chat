@@ -40,6 +40,11 @@ use Spatie\MediaLibrary\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation publicId($publicId)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Conversation whereLastMessageId($value)
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Conversation onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Query\Builder|\App\Conversation withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Conversation withoutTrashed()
  */
 class Conversation extends Model implements HasMediaConversions
 {

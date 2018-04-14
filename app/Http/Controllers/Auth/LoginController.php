@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -36,4 +37,38 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    /**
+     * Get the login username to be used by the controller.
+     *
+     * @return string
+     */
+    public function username()
+    {
+        return 'username';
+    }
+
+    /**
+     * Get the needed authorization credentials from the request.
+     *
+     * @param Request $request
+     * @return array
+     */
+    protected function credentials(Request $request)
+    {
+        $credentials = [
+            'password' => $request->input('password')
+        ];
+
+        $username = $request->input('username');
+
+        if(filter_var($username, FILTER_VALIDATE_EMAIL)) {
+            $credentials['email'] = $username;
+        } else {
+            $credentials['username'] = $username;
+        }
+
+        return $credentials;
+    }
+
 }

@@ -90,19 +90,23 @@ class ConversationController extends Controller
     public function show($conversationId, Request $request)
     {
         /** @var Conversation $conversation */
-        $conversation = Conversation::findByPublicId($conversationId);
-        $user = auth()->user();
-
-        if(! $conversation) {
-            return $this->responseNotFound();
-        }
+        $conversation = Conversation::publicId($conversationId)
+            ->with(['users' => function($query) {
+                $query->with(['media']);
+            }])
+            ->firstOrFail();
 
         $messages = $conversation->messages()
-            ->with('user')
             ->take(21)
             ->offset((int) $request->input('offset', 0))
             ->latest()
-            ->get();
+            ->get()
+            ->each(function(Message $message) use ($conversation) {
+                $message->setRelations([
+                    'conversation' => $conversation,
+                    'user' => $conversation->users->find($message->user_id)
+                ]);
+            });
 
         if($hasMore = $messages->count() > 20) {
             $messages->pop();

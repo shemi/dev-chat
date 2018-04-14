@@ -24,6 +24,9 @@ Route::group(['prefix' => 'api/v1'], function () {
     Route::post('/conversations/{conversationId}/message', 'MessageController@store')
         ->name('api.conversation.message.send');
 
+    Route::post('/conversations/{conversationId}/message/update-status', 'MessageController@updateStatuses')
+        ->name('api.conversation.message.update-statuses');
+
 });
 
 Route::get('/{subs?}', 'HomeController@index')

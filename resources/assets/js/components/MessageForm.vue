@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <div class="emoji-piker" v-if="isPikerOpen">
+        <div class="emoji-piker" v-show="isPikerOpen">
             <picker set="google"
                     title="Pick your emoji…"
                     emoji="point_up"
@@ -48,7 +48,6 @@
 </template>
 
 <script>
-
     import Editable from './Editable';
     import { Picker } from 'emoji-mart-vue';
 

@@ -12,12 +12,17 @@
             <div class="content">
                 <p>
                     <strong>{{ conversation.name }}</strong>
-                    <br>
                     <small v-if="! conversation.isGroup">
-                        @{{ conversation.contacts[0].username }}
+                        <br>
+                        @{{ conversation.getDirectContact().username }}
                     </small>
                 </p>
             </div>
+        </div>
+        <div class="media-right">
+            <b-tag type="is-primary" v-if="conversation.newMessageCount">
+                {{ conversation.newMessageCount }}
+            </b-tag>
         </div>
     </div>
 

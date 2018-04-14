@@ -29,13 +29,14 @@ class MessageController extends Controller
             'type' => 'required|in:1,2,3,4'
         ]);
 
-        /** @var Conversation $conversation */
-        $conversation = Conversation::findByPublicId($conversationId);
+        /** @var User $user */
         $user = auth()->user();
 
-        if(! $conversation) {
-            return $this->responseNotFound();
-        }
+        /** @var Conversation $conversation */
+        $conversation = $user->conversations()
+            ->publicId($conversationId)
+            ->with('users')
+            ->firstOrFail();
 
         $message = new Message();
         $message->body = $request->input('body');
@@ -43,7 +44,7 @@ class MessageController extends Controller
         $message->type = (int) $request->input('type');
         $message->statuses = [
             'read' => [$user->public_id],
-            'sent' => [$user->public_id]
+            'sent' => $conversation->users->transform(function(User $user) { return $user->public_id; })
         ];
         $message = $conversation->messages()->save($message);
 
@@ -54,6 +55,50 @@ class MessageController extends Controller
         MessageSent::broadcast($message, $conversation)->toOthers();
 
         return $this->response(MessageTransformer::transform($message));
+    }
+
+    public function updateStatuses($conversationId, Request $request)
+    {
+        $this->validate($request, [
+            'ids' => 'required|array'
+        ]);
+
+
+        /** @var User $user */
+        $user = auth()->user();
+
+        /** @var Conversation $conversation */
+        $conversation = $user->conversations()
+            ->publicId($conversationId)
+            ->firstOrFail();
+
+        $messagesIds = collect($request->input('ids'))
+            ->unique()
+            ->transform(function($id) {
+                return Message::decodePublicId($id);
+            });
+
+        $messages = $conversation->messages()
+            ->whereIn('id', $messagesIds)
+            ->get();
+
+        $messages->each(function(Message $message) use ($user) {
+            if(! isset($message->statuses['read'])) {
+                $message->statuses['read'] = [];
+            }
+
+            if(! in_array($user->public_id, $message->statuses['read'])) {
+                $statuses = $message->statuses;
+                array_push($statuses['read'], $user->public_id);
+
+                $message->statuses = $statuses;
+                $message->save();
+            }
+        });
+
+        return $this->response([
+            'messages' => MessageTransformer::transform($messages)
+        ]);
     }
 
     /**

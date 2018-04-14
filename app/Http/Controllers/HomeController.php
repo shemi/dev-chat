@@ -33,9 +33,22 @@ class HomeController extends Controller
     {
         /** @var User $user */
         $user = auth()->user();
+
         $conversations = $user
             ->conversations()
-            ->with(['users', 'lastMessage'])
+            ->with([
+                'users' => function($query) {
+                    $query->with('media');
+                },
+                'lastMessage'
+            ])
+            ->withCount([
+                'messages as new_messages_count' => function($query) use($user) {
+                    $query
+                        ->where('messages.user_id', '!=', $user->id)
+                        ->whereRaw("JSON_CONTAINS(`messages`.`statuses`, '[\"{$user->public_id}\"]', \"$.read\") <= 0");
+                }
+            ])
             ->latest('last_message_at')
             ->get();
 

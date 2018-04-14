@@ -57,8 +57,10 @@
             },
 
             sanitizeValue(value) {
-                const emojiRegex = /<img.*?title=["|'](.*?)["|'].*?>/gm;
+                const emojiRegex = /<img.*?title=["|'](.*?)["|'].*?>/gm,
+                      spanRegex = /(<span.*rangySelectionBoundary.*<\/span>)/gm;
                 value = value.replace(emojiRegex, ':$1:').trim();
+                value = value.replace(spanRegex, '');
                 value = striptags(value, [], '\n').trim();
 
                 return value;
@@ -98,10 +100,6 @@
                 }
 
                 this.$refs.textarea.focus();
-            },
-
-            convertEmojies() {
-                this.$refs.textarea.innerHTML = EmojiConvertor.replace_colons(this.$refs.textarea.innerHTML);
             },
 
             clearInput() {

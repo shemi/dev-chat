@@ -32,9 +32,10 @@ class ConversationTransformer extends Transformer
             'conversationId' => $conversation->public_id,
             'name' => $conversation->is_group ? $conversation->name : $contacts->first()->name,
             'lastMessage' => $lastMessages,
+            'newMessageCount' => $conversation->getAttribute('new_messages_count'),
             'lastMessageAt' => $this->formatDate($conversation->last_message_at),
             'messages' => $messages,
-            'contacts' => UserTransformer::transform($contacts),
+            'contacts' => UserTransformer::transform($conversation->users),
             'image' => $conversation->is_group ? null : $contacts->first()->profile_image,
             'isGroup' => $conversation->is_group
         ];

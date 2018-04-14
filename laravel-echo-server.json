@@ -20,7 +20,9 @@
 	"host": null,
 	"port": "6001",
 	"protocol": "http",
-	"socketio": {},
+	"socketio": {
+		"wsEngine": "uws"
+	},
 	"sslCertPath": "",
 	"sslKeyPath": "",
 	"sslCertChainPath": "",

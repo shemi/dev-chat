@@ -18,8 +18,8 @@ class UserTransformer extends Transformer
             'name' => $user->name,
             'image' => $user->profile_image,
             'username' => $user->username,
-            'color' => optional($user->pivot)->color,
-            'is_owner' => optional($user->pivot)->is_owner
+            'color' => optional($user->pivot)->color ?: '',
+            'is_owner' => (boolean) optional($user->pivot)->is_owner
         ];
     }
 }

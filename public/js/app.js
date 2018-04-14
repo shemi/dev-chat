@@ -56597,9 +56597,11 @@ var Echo = function () {
             var _this2 = this;
 
             axios.interceptors.request.use(function (config) {
+
                 if (_this2.socketId()) {
                     config.headers['X-Socket-Id'] = _this2.socketId();
                 }
+
                 return config;
             });
         }
@@ -56833,6 +56835,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                 module.warn("Cannot save selection. This usually happens when the selection is collapsed and the selection document has lost focus.");
                 return null;
             }
+
             var sel = api.getSelection(win);
             var ranges = sel.getAllRanges();
             var backward = (ranges.length == 1 && sel.isBackward());
@@ -58625,7 +58628,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 
-
 exports.default = {
 
     props: ['conversation'],
@@ -58785,8 +58787,10 @@ exports.default = {
             this.saveSelection();
         },
         sanitizeValue: function sanitizeValue(value) {
-            var emojiRegex = /<img.*?title=["|'](.*?)["|'].*?>/gm;
+            var emojiRegex = /<img.*?title=["|'](.*?)["|'].*?>/gm,
+                spanRegex = /(<span.*rangySelectionBoundary.*<\/span>)/gm;
             value = value.replace(emojiRegex, ':$1:').trim();
+            value = value.replace(spanRegex, '');
             value = (0, _striptags2.default)(value, [], '\n').trim();
 
             return value;
@@ -58819,9 +58823,6 @@ exports.default = {
             }
 
             this.$refs.textarea.focus();
-        },
-        convertEmojies: function convertEmojies() {
-            this.$refs.textarea.innerHTML = _EmojiConvertor2.default.replace_colons(this.$refs.textarea.innerHTML);
         },
         clearInput: function clearInput() {
             if (this.selection) {
@@ -64782,26 +64783,34 @@ var render = function() {
       ])
     ]),
     _vm._v(" "),
-    _vm.isPikerOpen
-      ? _c(
-          "div",
-          { staticClass: "emoji-piker" },
-          [
-            _c("picker", {
-              style: { width: "100%", borderRadius: 0 },
-              attrs: {
-                set: "google",
-                title: "Pick your emoji…",
-                emoji: "point_up",
-                autoFocus: true,
-                color: ""
-              },
-              on: { click: _vm.addEmoji }
-            })
-          ],
-          1
-        )
-      : _vm._e()
+    _c(
+      "div",
+      {
+        directives: [
+          {
+            name: "show",
+            rawName: "v-show",
+            value: _vm.isPikerOpen,
+            expression: "isPikerOpen"
+          }
+        ],
+        staticClass: "emoji-piker"
+      },
+      [
+        _c("picker", {
+          style: { width: "100%", borderRadius: 0 },
+          attrs: {
+            set: "google",
+            title: "Pick your emoji…",
+            emoji: "point_up",
+            autoFocus: true,
+            color: ""
+          },
+          on: { click: _vm.addEmoji }
+        })
+      ],
+      1
+    )
   ])
 }
 var staticRenderFns = []
@@ -65799,17 +65808,30 @@ exports.default = {
     props: ['message'],
 
     data: function data() {
-        return {};
+        return {
+            updateMessageClock: null
+        };
     },
-    mounted: function mounted() {},
+    mounted: function mounted() {
+        this.updateMessageStatus();
+    },
 
+
+    methods: {
+        updateMessageStatus: function updateMessageStatus() {
+            this.updateMessageClock = setTimeout(function () {
+                this.message.updateStatus();
+                this.updateMessageClock = null;
+            }.bind(this), 500);
+        }
+    },
 
     computed: {
         body: function body() {
             return _EmojiConvertor2.default.replace_colons(_Showdown2.default.convert(this.message.body));
         },
         avatarStyle: function avatarStyle() {
-            if (!this.message.by || !this.message.by.color) {
+            if (this.message.mine || !this.message.by || !this.message.by.color) {
                 return {};
             }
 
@@ -65818,7 +65840,7 @@ exports.default = {
             };
         },
         bodyStyle: function bodyStyle() {
-            if (!this.message.by || !this.message.by.color) {
+            if (this.message.mine || !this.message.by || !this.message.by.color) {
                 return {};
             }
 
@@ -65827,8 +65849,13 @@ exports.default = {
                 backgroundColor: this.message.by.color
             };
         }
-    }
+    },
 
+    beforeDestroy: function beforeDestroy() {
+        if (this.updateMessageClock) {
+            clearTimeout(this.updateMessageClock);
+        }
+    }
 };
 
 /***/ }),
@@ -89427,10 +89454,7 @@ var render = function() {
         _c("small", [_vm._v("@" + _vm._s(_vm.message.by.username))])
       ]),
       _vm._v(" "),
-      _c("div", {
-        staticClass: "content",
-        domProps: { innerHTML: _vm._s(_vm.body) }
-      }),
+      _vm._m(0),
       _vm._v(" "),
       _c("div", { staticClass: "time" }, [
         _vm._v(
@@ -89442,7 +89466,17 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", {
+      staticClass: "content",
+      domProps: { innerHTML: _vm._s(_vm.body) }
+    })
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -90616,6 +90650,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 var _vuex = __webpack_require__(5);
@@ -90666,20 +90705,36 @@ var render = function() {
           _c("p", [
             _c("strong", [_vm._v(_vm._s(_vm.conversation.name))]),
             _vm._v(" "),
-            _c("br"),
-            _vm._v(" "),
             !_vm.conversation.isGroup
               ? _c("small", [
+                  _c("br"),
                   _vm._v(
                     "\n                    @" +
-                      _vm._s(_vm.conversation.contacts[0].username) +
+                      _vm._s(_vm.conversation.getDirectContact().username) +
                       "\n                "
                   )
                 ])
               : _vm._e()
           ])
         ])
-      ])
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "media-right" },
+        [
+          _vm.conversation.newMessageCount
+            ? _c("b-tag", { attrs: { type: "is-primary" } }, [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.conversation.newMessageCount) +
+                    "\n        "
+                )
+              ])
+            : _vm._e()
+        ],
+        1
+      )
     ]
   )
 }
@@ -91061,6 +91116,16 @@ var MessageResource = function (_Resource) {
                 }
             });
         }
+    }, {
+        key: 'updateStatuses',
+        value: function updateStatuses(ids, conversationId) {
+            return this.sync('post', { ids: ids }, {
+                keys: {
+                    conversationId: conversationId,
+                    action: 'update-status'
+                }
+            });
+        }
     }]);
 
     return MessageResource;
@@ -91292,7 +91357,13 @@ var Conversation = function () {
         this._lastScrollTop = null;
         this._lastElClientHight = null;
         this._lastElScrollHeight = null;
-        this._newMessagePlayer = new Audio(__webpack_require__(313));
+
+        this._directContact = null;
+
+        this._messagesIdsToUpdateStatus = [];
+        this._updatingMessagesStatus = false;
+
+        this._newMessageAudioPlayer = new Audio(__webpack_require__(313));
 
         if (attributes) {
             this.setAttributes(attributes);
@@ -91306,8 +91377,9 @@ var Conversation = function () {
             this.name = attributes.name || '';
             this.lastMessage = attributes.lastMessage || '';
             this.lastMessageAt = attributes.lastMessageAt ? (0, _moment2.default)(attributes.lastMessageAt) : null;
-            this.contacts = attributes.contacts || [];
+            this.contacts = _lodash2.default.keyBy(attributes.contacts, 'id') || {};
             this.messages = [];
+            this.newMessageCount = attributes.newMessageCount || 0;
 
             if (_lodash2.default.isArray(attributes.messages) && attributes.messages.length > 0) {
                 this.addMessages(attributes.messages);
@@ -91365,11 +91437,19 @@ var Conversation = function () {
             var _this = this;
 
             this._connection = Echo.private('conversation.' + this.conversationId);
+            this._connected = true;
 
             this._connection.listen('MessageSent', function (e) {
-                _this._newMessagePlayer.play();
+                _this._newMessageAudioPlayer.play();
+                _this.newMessageCount++;
+                e.message.isNew = true;
                 _this.addMessage(e.message);
             });
+        }
+    }, {
+        key: 'isConnected',
+        value: function isConnected() {
+            return this._connected;
         }
     }, {
         key: 'isFetchingMessages',
@@ -91472,7 +91552,6 @@ var Conversation = function () {
                 message = new _Message2.default(message, this);
             }
 
-            var messages = void 0;
             var groupKey = message.createdAt.format('YYYY-MM-DD'),
                 messagesObject = void 0;
 
@@ -91503,8 +91582,6 @@ var Conversation = function () {
                 }
             }
 
-            console.log(message);
-
             if (!messagesObject) {
                 messagesObject = {
                     date: groupKey,
@@ -91522,6 +91599,8 @@ var Conversation = function () {
                 messagesObject.messages.unshift(message);
             } else {
                 messagesObject.messages.push(message);
+                this.lastMessage = message;
+                this.lastMessageAt = message.createdAt;
             }
 
             this._messageCount++;
@@ -91537,9 +91616,9 @@ var Conversation = function () {
 
             if (!(message instanceof _Message2.default)) {
                 message = _Message2.default.new(message, _index2.default.state.user, type || _Message2.default.TYPE_TEXT, this);
-
-                this.addMessage(message);
             }
+
+            this.addMessage(message);
 
             if (!this.conversationId) {
                 this.create().then(function (res) {
@@ -91554,49 +91633,68 @@ var Conversation = function () {
             return this;
         }
     }, {
-        key: 'getContactColor',
-        value: function getContactColor(id) {
-            if (!id) {
-                throw new Error('ID is needed');
+        key: 'updateMessageStatus',
+        value: function updateMessageStatus(id) {
+            this._messagesIdsToUpdateStatus.push(id);
+
+            _lodash2.default.debounce(this.updateMessagesStatus.bind(this), 600)();
+        }
+    }, {
+        key: 'updateMessagesStatus',
+        value: function updateMessagesStatus() {
+            var _this5 = this;
+
+            if (this._messagesIdsToUpdateStatus.length <= 0) {
+                return;
             }
 
-            if (this._colors[id]) {
-                return this._colors[id];
+            if (this._updatingMessagesStatus) {
+                setTimeout(function () {
+                    this.updateMessagesStatus();
+                }.bind(this), 0);
+
+                return;
             }
 
-            var color = null,
-                contact = void 0;
+            var ids = _lodash2.default.clone(this._messagesIdsToUpdateStatus);
+            this._messagesIdsToUpdateStatus.length = 0;
+            this._updatingMessagesStatus = 1;
 
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+            _index3.message.updateStatuses(_lodash2.default.uniq(ids), this.conversationId).then(function (_ref3) {
+                var data = _ref3.data;
 
-            try {
-                for (var _iterator3 = this.contacts[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    contact = _step3.value;
+                _this5._updatingMessagesStatus = false;
 
-                    if (contact.id === id) {
-                        this._colors[id] = color = contact.color;
-
-                        break;
+                _lodash2.default.each(data.messages, function (message) {
+                    if (this.newMessageCount > 0) {
+                        this.newMessageCount--;
                     }
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
+                }.bind(_this5));
+            }).catch(function (err) {
+                _this5._updatingMessagesStatus = false;
+            });
+        }
+    }, {
+        key: 'getContact',
+        value: function getContact(id) {
+            return this.contacts[id] || {};
+        }
+    }, {
+        key: 'getDirectContact',
+        value: function getDirectContact() {
+            if (this.isGroup) {
+                return false;
             }
 
-            return color;
+            if (this._directContact) {
+                return this._directContact;
+            }
+
+            this._directContact = this.getContact(_lodash2.default.findKey(this.contacts, function (contact) {
+                return contact.id !== _index2.default.state.user.id;
+            }));
+
+            return this._directContact;
         }
     }, {
         key: 'toJson',
@@ -91683,15 +91781,24 @@ var Message = function () {
             this.type = attributes.type || Message.TYPE_TEXT;
             this.sent = attributes.sent || false;
             this.read = attributes.read || false;
-            this.mine = attributes.mine || attributes.by.id === _index2.default.state.user.id;
+            this.isNew = attributes.isNew || false;
+            this.mine = attributes.by === _index2.default.state.user.id;
         }
     }, {
         key: 'setBy',
-        value: function setBy(contact) {
-            contact.color = this._conversation.getContactColor(contact.id);
-            this.by = contact;
+        value: function setBy(id) {
+            this.by = this._conversation.getContact(id);
 
             return this;
+        }
+    }, {
+        key: 'updateStatus',
+        value: function updateStatus() {
+            if (!this.id || !this.isNew) {
+                return;
+            }
+
+            this._conversation.updateMessageStatus(this.id);
         }
     }, {
         key: 'send',
@@ -91728,12 +91835,13 @@ var Message = function () {
         value: function _new(message, user, type, conversation) {
             return new Message({
                 'body': message.toString(),
-                'by': user,
+                'by': user.id,
                 'type': type,
                 'createdAt': (0, _moment2.default)(),
                 'id': null,
                 'sent': false,
                 'read': false,
+                'isNew': _index2.default.state.user.id !== user.id,
                 'mine': _index2.default.state.user.id === user.id
             }, conversation);
         }

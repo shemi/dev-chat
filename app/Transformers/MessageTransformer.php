@@ -18,9 +18,11 @@ class MessageTransformer extends Transformer
         return [
             'id' => $message->public_id,
             'body' => $message->body,
-            'by' => UserTransformer::transform($message->user),
+            'by' => User::encodePublicId($message->user_id),
             'type' => $message->type,
             'createdAt' => $this->formatDate($message->created_at),
+            'mine' => null,
+            'isNew' => $message->is_new,
             'sent' => true
         ];
     }

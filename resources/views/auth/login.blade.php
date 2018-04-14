@@ -8,18 +8,17 @@
 
 @section('content')
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" novalidate>
         @csrf
 
-        <b-field label="{{ __('E-Mail Address') }}"
-                 @if ($errors->has('email'))
+        <b-field label="{{ __('Username or E-Mail Address') }}"
+                 @if ($errors->has('username'))
                  type="is-danger"
-                 message="{{ $errors->first('email') }}"
                 @endif
-        >
+                 message="{{ $errors->first('username') }}">
             <b-input value="{{ old('email') }}"
-                     name="email"
-                     type="email"
+                     name="username"
+                     type="text"
                      required
                      autofocus>
             </b-input>

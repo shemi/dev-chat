@@ -17,7 +17,7 @@ trait HasPublicId
      */
     public function scopePublicId($query, $publicId)
     {
-        return $query->where('id', static::decodePublicId($publicId));
+        return $query->where($this->getTable().'.id', static::decodePublicId($publicId));
     }
 
     /**

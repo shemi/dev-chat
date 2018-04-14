@@ -25,14 +25,22 @@ class Message {
         this.type = attributes.type || Message.TYPE_TEXT;
         this.sent = attributes.sent || false;
         this.read = attributes.read || false;
-        this.mine = attributes.mine || attributes.by.id === store.state.user.id;
+        this.isNew = attributes.isNew || false;
+        this.mine = attributes.by === store.state.user.id;
     }
 
-    setBy(contact) {
-        contact.color = this._conversation.getContactColor(contact.id);
-        this.by = contact;
+    setBy(id) {
+        this.by = this._conversation.getContact(id);
 
         return this;
+    }
+
+    updateStatus() {
+        if(! this.id || ! this.isNew) {
+            return;
+        }
+
+        this._conversation.updateMessageStatus(this.id);
     }
 
     send() {
@@ -65,12 +73,13 @@ class Message {
     static new(message, user, type, conversation) {
         return new Message({
             'body': message.toString(),
-            'by': user,
+            'by': user.id,
             'type': type,
             'createdAt': moment(),
             'id': null,
             'sent': false,
             'read': false,
+            'isNew': store.state.user.id !== user.id,
             'mine': store.state.user.id === user.id
         }, conversation);
     }

@@ -12,6 +12,15 @@ class MessageResource extends Resource {
         });
     }
 
+    updateStatuses(ids, conversationId) {
+        return this.sync('post', {ids}, {
+            keys: {
+                conversationId: conversationId,
+                action: 'update-status'
+            }
+        });
+    }
+
 }
 
 export default MessageResource;

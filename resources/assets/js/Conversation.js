@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Message from './Message';
 import store from './store/index';
-import {conversation as Resource} from './Resources/index';
+import {conversation as Resource, message as MessageResource} from './Resources/index';
 import moment from 'moment';
 import {isNull} from './Utils';
 import _ from 'lodash';
@@ -20,7 +20,13 @@ class Conversation {
         this._lastScrollTop = null;
         this._lastElClientHight = null;
         this._lastElScrollHeight = null;
-        this._newMessagePlayer = new Audio(require('../sound/message.mp3'));
+
+        this._directContact = null;
+
+        this._messagesIdsToUpdateStatus = [];
+        this._updatingMessagesStatus = false;
+
+        this._newMessageAudioPlayer = new Audio(require('../sound/message.mp3'));
 
         if (attributes) {
             this.setAttributes(attributes);
@@ -32,8 +38,9 @@ class Conversation {
         this.name = attributes.name || '';
         this.lastMessage = attributes.lastMessage || '';
         this.lastMessageAt = attributes.lastMessageAt ? moment(attributes.lastMessageAt) : null;
-        this.contacts = attributes.contacts || [];
+        this.contacts = _.keyBy(attributes.contacts, 'id') || {};
         this.messages = [];
+        this.newMessageCount = attributes.newMessageCount || 0;
 
         if (_.isArray(attributes.messages) && attributes.messages.length > 0) {
             this.addMessages(attributes.messages);
@@ -84,11 +91,18 @@ class Conversation {
 
     connect() {
         this._connection = Echo.private('conversation.' + this.conversationId);
+        this._connected = true;
 
         this._connection.listen('MessageSent', e => {
-            this._newMessagePlayer.play();
+            this._newMessageAudioPlayer.play();
+            this.newMessageCount++;
+            e.message.isNew = true;
             this.addMessage(e.message);
         });
+    }
+
+    isConnected() {
+        return this._connected;
     }
 
     isFetchingMessages() {
@@ -105,19 +119,19 @@ class Conversation {
                     offset: this._messageCount
                 }
             })
-                .then(({data}) => {
-                    this.addMessages(data.messages, true);
-                    this._hasOlderMessage = data.hasMore;
-                    this._fetchingMessages = false;
-                    this._messagesLoaded = true;
+            .then(({data}) => {
+                this.addMessages(data.messages, true);
+                this._hasOlderMessage = data.hasMore;
+                this._fetchingMessages = false;
+                this._messagesLoaded = true;
 
-                    resolve(this);
-                })
-                .catch(err => {
-                    this._fetchingMessages = false;
+                resolve(this);
+            })
+            .catch(err => {
+                this._fetchingMessages = false;
 
-                    reject(err);
-                });
+                reject(err);
+            });
         });
     }
 
@@ -156,7 +170,6 @@ class Conversation {
             message = new Message(message, this);
         }
 
-        let messages;
         let groupKey = message.createdAt.format('YYYY-MM-DD'),
             messagesObject;
 
@@ -166,8 +179,6 @@ class Conversation {
                 messagesObject = group;
             }
         }
-
-        console.log(message);
 
         if(! messagesObject) {
             messagesObject = {
@@ -187,6 +198,8 @@ class Conversation {
             messagesObject.messages.unshift(message);
         } else {
             messagesObject.messages.push(message);
+            this.lastMessage = message;
+            this.lastMessageAt = message.createdAt;
         }
 
         this._messageCount++;
@@ -203,8 +216,9 @@ class Conversation {
                 this
             );
 
-            this.addMessage(message);
         }
+
+        this.addMessage(message);
 
         if (!this.conversationId) {
             this.create()
@@ -215,32 +229,68 @@ class Conversation {
             return this;
         }
 
+
         message.send();
 
         return this;
     }
 
-    getContactColor(id) {
-        if (!id) {
-            throw new Error('ID is needed');
+    updateMessageStatus(id) {
+        this._messagesIdsToUpdateStatus.push(id);
+
+        _.debounce(this.updateMessagesStatus.bind(this), 600)();
+    }
+
+    updateMessagesStatus() {
+        if(this._messagesIdsToUpdateStatus.length <= 0) {
+            return;
         }
 
-        if (this._colors[id]) {
-            return this._colors[id];
+        if(this._updatingMessagesStatus) {
+            setTimeout(function() {
+                this.updateMessagesStatus();
+            }.bind(this), 0);
+
+            return;
         }
 
-        let color = null,
-            contact;
+        let ids = _.clone(this._messagesIdsToUpdateStatus);
+        this._messagesIdsToUpdateStatus.length = 0;
+        this._updatingMessagesStatus = 1;
 
-        for (contact of this.contacts) {
-            if (contact.id === id) {
-                this._colors[id] = color = contact.color;
+        MessageResource.updateStatuses(_.uniq(ids), this.conversationId)
+            .then(({data}) => {
+                this._updatingMessagesStatus = false;
 
-                break;
-            }
+                _.each(data.messages, function(message) {
+                    if(this.newMessageCount > 0) {
+                        this.newMessageCount--;
+                    }
+                }.bind(this));
+            })
+            .catch(err => {
+                this._updatingMessagesStatus = false;
+            });
+    }
+
+    getContact(id) {
+        return this.contacts[id] || {};
+    }
+
+    getDirectContact() {
+        if(this.isGroup) {
+            return false;
         }
 
-        return color;
+        if(this._directContact) {
+            return this._directContact;
+        }
+
+        this._directContact = this.getContact(_.findKey(this.contacts, function(contact) {
+            return contact.id !== store.state.user.id;
+        }));
+
+        return this._directContact;
     }
 
     toJson() {
